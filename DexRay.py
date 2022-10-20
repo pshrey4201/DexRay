@@ -163,7 +163,7 @@ if __name__ == "__main__":
   
   CHANNELS = 1
   EPOCHS = 200
-  BATCH_SIZE = 500
+  BATCH_SIZE = 20
   IMG_SIZE = 128
   PATH_FILES = "data_splits"
   CLASS_NAMES = ['goodware', 'malware']
