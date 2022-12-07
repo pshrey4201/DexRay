@@ -4,6 +4,7 @@ import random as python_random
 import tensorflow_addons as tfa
 import tensorflow.keras as keras
 from PIL import Image
+import time
 
 random_seed = 123456
 
@@ -51,10 +52,11 @@ def get_shape(image):
 def decode_img(path_img):
     image = tf.numpy_function(get_image, [path_img], tf.uint8)
     shape = tf.numpy_function(get_shape, [image], tf.int64)
-    image = tf.reshape(image, [shape, 1, 1])
+    image = tf.reshape(image, [shape * shape, 1])
     image = tf.image.convert_image_dtype(image, tf.float32)
-    image = tf.image.resize(image, [IMG_SIZE*IMG_SIZE, 1])
-    return tf.reshape(image, [IMG_SIZE*IMG_SIZE, 1])
+    #image = tf.image.resize(image, [IMG_SIZE*IMG_SIZE, 1])
+    #return tf.reshape(image, [IMG_SIZE*IMG_SIZE, 1])
+    return image
 
 def process_path(file_path):
     label = get_label(file_path)
@@ -65,7 +67,7 @@ def main(path_images, dir_name, file_name, CHANNELS, EPOCHS, BATCH_SIZE, IMG_SIZ
   recall_list, precision_list, accuracy_list, f1_list = [], [], [], []
   
   model_architecture = Sequential()           
-  model_architecture.add(Conv1D(filters=64, kernel_size=12, activation='relu', input_shape=(IMG_SIZE*IMG_SIZE, 1)))
+  model_architecture.add(Conv1D(filters=64, kernel_size=12, activation='relu', input_shape=(IMG_SIZE * IMG_SIZE, 1)))
   model_architecture.add(MaxPooling1D(pool_size=12))           
   model_architecture.add(Conv1D(filters=128, kernel_size=12, activation='relu')) 
   model_architecture.add(MaxPooling1D(pool_size=12))                     
@@ -167,4 +169,7 @@ if __name__ == "__main__":
   IMG_SIZE = 128
   PATH_FILES = "data_splits"
   CLASS_NAMES = ['goodware', 'malware']
+  begin = time.time()
   main(path_images, dir_name, file_name, CHANNELS, EPOCHS, BATCH_SIZE, IMG_SIZE, PATH_FILES, CLASS_NAMES)
+  end = time.time()
+  print("Total runtime: {0:.3f}s".format(end-begin))
